@@ -11,6 +11,10 @@
         </div>
         <div class="chat-message__text">
             {{ text }}
+            <button v-if="audioUrl" @click="toggleAudio" class="audio-control">
+                <span v-if="!isPlaying" class="material-symbols-outlined">play_circle</span>
+            </button>
+            <audio ref="player" :src="audioUrl" @ended="resetAudio"></audio>
         </div>
     </div>
 </template>
@@ -34,6 +38,28 @@ export default {
     author: {
       type: String,
       default: 'assistant'
+    },
+    audioUrl: String,
+  },
+  data() {
+    return {
+      audioUrl: 'http://54.162.246.131/app/speech.mp3',
+      isPlaying: false
+    };
+  },
+  methods: {
+    toggleAudio() {
+      const player = this.$refs.player;
+      if (player.paused) {
+        player.play();
+        this.isPlaying = true;
+      } else {
+        player.pause();
+        this.isPlaying = false;
+      }
+    },
+    resetAudio() {
+      this.isPlaying = false;
     }
   },
 
@@ -64,6 +90,25 @@ export default {
 
         .chat-message__text {
             padding: 15px;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            .audio-control {
+                background: none;
+                border: none;
+                cursor: pointer;
+                padding: 0;
+
+                .material-symbols-outlined {
+                    padding: 0%;
+                    margin: 0%;
+                    width: 15px;
+                }
+            }
+
+            .audio-control:focus {
+                outline: none;
+            }
         }
     
         &.is-user {

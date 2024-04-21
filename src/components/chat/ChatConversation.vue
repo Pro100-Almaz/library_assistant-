@@ -1,7 +1,7 @@
 <template>
     <div class="chat-conversation">
         <div class="chat-conversation__messages">
-            <ChatMessage v-for="(message, index) in messages" :key="index" :text="message.text" :author="message.author" />
+            <ChatMessage v-for="(message, index) in messages" :key="index" :text="message.text" :author="message.author"/>
         </div>
         <ChatLoading v-if="isLoading" />
     </div>
@@ -16,6 +16,21 @@ export default {
   components: {
     ChatMessage,
     ChatLoading
+  },
+  data() {
+    return {
+      audioUrl: 'http://54.162.246.131/app/speech.mp3'
+    };
+  },
+  methods: {
+    playAudio() {
+      console.log("I have requested audio")
+      const player = this.$refs.audioPlayer;
+      player.play().catch(error => {
+        console.error("Error playing the audio:", error);
+        alert('Failed to play the audio.');
+      });
+    }
   },
   props: {
     messages: {

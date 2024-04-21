@@ -139,9 +139,12 @@ export default {
             width: 100%;
             background: var( --color--gray-lighter );
             border-radius: 15px;
+            gap: 5px;
 
             input {
+                overflow: auto;
                 display: flex;
+                max-width: 85%;
                 padding: 0 100px 0 15px;
                 background: transparent;
                 font-size: 14px;
