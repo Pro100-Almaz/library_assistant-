@@ -43,7 +43,8 @@ export default {
   },
   data() {
     return {
-      isPlaying: false
+      isPlaying: false,
+      audioUrl: 'http://54.162.246.131/app/speech.mp3'
     };
   },
   methods: {
