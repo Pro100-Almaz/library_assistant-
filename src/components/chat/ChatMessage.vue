@@ -48,7 +48,23 @@ export default {
     };
   },
   methods: {
-    toggleAudio() {
+    async toggleAudio() {
+      const options = {
+        method: 'POST',
+        body: JSON.stringify({
+          text: this.text
+        }),
+      };
+
+      try {
+        console.log(this.text)
+        const response = await fetch('http://54.162.246.131:8080/v1/text-to-audio', options);
+        const data = await response.json();
+        console.log(data)
+      } catch (error) {
+        console.error(error);
+      }
+
       const player = this.$refs.player;
       if (player.paused) {
         player.play();
