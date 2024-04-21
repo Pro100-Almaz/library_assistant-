@@ -1,0 +1,5 @@
+{
+    "require": {
+        "codeat3/blade-fontaudio": "^1.6"
+    }
+}
