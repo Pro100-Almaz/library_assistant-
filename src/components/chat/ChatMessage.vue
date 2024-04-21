@@ -43,7 +43,6 @@ export default {
   },
   data() {
     return {
-      audioUrl: 'http://54.162.246.131/app/speech.mp3',
       isPlaying: false
     };
   },
@@ -64,7 +63,8 @@ export default {
       } catch (error) {
         console.error(error);
       }
-
+      
+      audioUrl.value = 'http://54.162.246.131/app/speech.mp3'
       const player = this.$refs.player;
       if (player.paused) {
         player.play();
