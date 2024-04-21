@@ -11,10 +11,10 @@
         </div>
         <div class="chat-message__text">
             {{ text }}
-            <button v-if="audioUrl" @click="toggleAudio" class="audio-control">
+            <button v-if="isAssistant" @click="fetchAndUpdateAudio" class="audio-control">
                 <span v-if="!isPlaying" class="material-symbols-outlined">play_circle</span>
             </button>
-            <audio ref="player" :src="audioUrl" @ended="resetAudio"></audio>
+            <audio ref="audioPlayer" :src="currentAudioUrl" @ended="resetAudio"></audio>
         </div>
     </div>
 </template>
@@ -22,6 +22,7 @@
 <script>
 import { computed, toRefs } from 'vue';
 import { Icon } from '@iconify/vue';
+import axios from 'axios';
 import AssistantLogoImage from '@/assets/assistant_logo.svg';
 
 export default {
@@ -44,36 +45,36 @@ export default {
   data() {
     return {
       isPlaying: false,
-      audioUrl: 'http://54.162.246.131/app/speech.mp3'
+      baseAudioUrl: 'http://54.162.246.131/app/',
+      currentAudioFileName: '',
+      currentAudioUrl: ''
     };
   },
+  watch: {
+    currentAudioFileName(newFileName) {
+      this.currentAudioUrl = `${this.baseAudioUrl}${newFileName}`;
+      this.playAudio();
+    }
+  },
   methods: {
-    async toggleAudio() {
-      const options = {
-        method: 'POST',
-        body: JSON.stringify({
-          text: this.text
-        }),
-      };
-
-      try {
-        console.log(this.text)
-        const response = await fetch('http://54.162.246.131:8080/v1/text-to-audio', options);
-        const data = await response.json();
-        console.log(data)
-      } catch (error) {
-        console.error(error);
-      }
-      
-      audioUrl.value = 'http://54.162.246.131/app/speech.mp3'
-      const player = this.$refs.player;
-      if (player.paused) {
-        player.play();
-        this.isPlaying = true;
-      } else {
-        player.pause();
-        this.isPlaying = false;
-      }
+    fetchAndUpdateAudio() {
+      axios.post('http://54.162.246.131:8080/v1/text-to-audio', { 'text': this.text })
+        .then(response => {
+          this.currentAudioFileName = response.data.text; // Assuming the backend sends the new file name
+        })
+        .catch(error => {
+          console.error('Error fetching audio:', error);
+        });
+    },
+    playAudio() {
+      this.$nextTick(() => {
+        let audioPlayer = this.$refs.audioPlayer;
+        audioPlayer.load(); // Load the new audio source
+        audioPlayer.play().catch(error => {
+          console.error('Error playing audio:', error);
+          alert('Playback failed, please check the console for more details.');
+        });
+      });
     },
     resetAudio() {
       this.isPlaying = false;
@@ -90,6 +91,7 @@ export default {
     const isAssistant = computed( () => {
         return author.value === 'assistant';
     } );
+
 
     return {
       isUser,
