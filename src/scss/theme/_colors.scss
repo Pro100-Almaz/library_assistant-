@@ -1,6 +1,7 @@
 @import "../mixins/index";
 
 $primary: #019EBF;
+$secondary: #7e3a0d;
 $success: #48C78E;
 $info: #485FC7;
 $warning: #FFE08A;
@@ -10,6 +11,7 @@ $light: #FFFFFF;
 
 $default-colors: (
     --color--primary: $primary,
+    --color--secondary: $secondary,
     --color--success: $success,
     --color--info: $info,
     --color--warning: $warning,

@@ -139,6 +139,22 @@ export default {
     @include box-shadow($primary);
 }
 
+.base-button.button.is-info {
+    background-color: $info;
+    color: $light;
+    border-color: transparent;
+
+    @include box-shadow($info);
+}
+
+.base-button.button.is-danger {
+    background-color: $danger;
+    color: $light;
+    border-color: transparent;
+
+    @include box-shadow($danger);
+}
+
 .base-button.button.is-primary:hover {
     background-color: darken( $primary, 5% );
     color: $light;
@@ -146,6 +162,17 @@ export default {
 }
 
 .base-button.button.is-primary:focus {
+    color: $light;
+    border-color: transparent;
+}
+
+.base-button.button.is-info:hover {
+    background-color: darken( $info, 5% );
+    color: $light;
+    border-color: transparent;
+}
+
+.base-button.button.is-info:focus {
     color: $light;
     border-color: transparent;
 }

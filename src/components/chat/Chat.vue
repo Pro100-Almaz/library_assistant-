@@ -2,12 +2,12 @@
     <div class="chat mx-auto my-10">
         <ChatHeader />
         <ChatConversation ref="messagesRef" :messages="messages" :isLoading="isLoading" />
-        <ChatBox @update:messages="onUpdateMessagesDo" />
+        <ChatBox @update:messages="sendMessage" />
     </div>
 </template>
 
 <script>
-import { ref, reactive, nextTick } from 'vue';
+import { ref, reactive, nextTick, onMounted } from 'vue';
 import ChatConversation from '@/components/chat/ChatConversation.vue';
 import ChatHeader from '@components/chat/ChatHeader.vue';
 import ChatBox from '@components/chat/ChatBox.vue';
@@ -20,87 +20,57 @@ export default {
     ChatConversation
   },
   setup() {
-    const isLoading = ref( false );
-    const messages = reactive( [
+    const isLoading = ref(false);
+    const chat_id = ref(null);
+    const messages = reactive([
       {
-        text: 'Hello, i\'m AI Assistant of Nazarbayev University. How can i help you?',
+        text: "Hello, I'm AI Assistant of Nazarbayev University. How can I help you?",
         author: 'assistant'
       },
-    ] );
-    const messagesRef = ref( null );
+    ]);
 
-    const onUpdateMessagesDo = ( value ) => {
-      sendMessage( value );
+    const messagesRef = ref(null);
+
+    const sendMessage = async (textValue) => {
+      messages.push({ text: textValue, author: 'user' });
+      console.log('I am at request part');
+      await scrollToBottomMessages();
+      
+      const options = {
+        method: 'POST',
+        body: JSON.stringify({
+          chat_id: chat_id.value,
+          text: textValue
+        }),
+      };
+
+      isLoading.value = true;
+      try {
+        const response = await fetch('http://54.162.246.131:8080/v1/chat', options);
+        const data = await response.json();
+        messages.push({ text: data.text, author: 'assistant' });
+        await scrollToBottomMessages();
+      } catch (error) {
+        console.error(error);
+      } finally {
+        isLoading.value = false;
+      }
     };
 
     const scrollToBottomMessages = async () => {
       await nextTick();
-      const element = messagesRef.value;
-       element.$el.scrollTo( { top: element.$el.scrollHeight } );
-    };
-
-    const sendMessage = async ( textValue ) => {
-      messages.push( {
-        text: textValue,
-        author: 'user'
-      } );
-
-      console.log( 'I am at request part' );
-
-      scrollToBottomMessages();
-
-      const options = {
-        method: 'POST',
-        // headers: {
-        //   'Content-Type': 'application/json',
-        //   Authorization: `Bearer ${import.meta.env.VITE_OPENAI_API_KEY}`,
-        // },
-        body: JSON.stringify( {
-          // model: 'text-davinci-003',
-          // prompt: textValue,
-          // temperature: 0.9,
-          // max_tokens: 150,
-          // top_p: 1.0,
-          // frequency_penalty: 0,
-          // presence_penalty: 0.6,
-          chat_id: '220de137-8e3c-477e-a519-8073fdc29bb3',
-          text: textValue
-        } ),
-      };
-
-      try {
-        isLoading.value = true;
-
-        const response = await fetch(
-          'http://54.162.246.131:8080/v1/chat',
-          options
-        );
-        const data = await response.json();
-        console.log( data.text );
-
-        messages.push( {
-          text: data.text,
-          author: 'assistant'
-        } );
-
-        scrollToBottomMessages();
-
-        isLoading.value = false;
-      } catch ( error ) {
-        console.error( error );
-
-        isLoading.value = false;
-      }
+      messagesRef.value?.$el.scrollTo({ top: messagesRef.value.$el.scrollHeight });
     };
 
     return {
       isLoading,
       messages,
       messagesRef,
-      onUpdateMessagesDo
+      sendMessage // Updated to expose sendMessage
     };
   }
 };
+
 </script>
 
 <style lang="scss" scoped>
